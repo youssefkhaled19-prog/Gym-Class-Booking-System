@@ -71,11 +71,11 @@ export default function BookingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookings.map((booking) => (
               <div key={booking._id} className="bg-gray-800 p-6 rounded-xl">
-                <h3 className="text-xl font-bold mb-2">{booking.gymClass?.name}</h3>
-                <p className="text-gray-400 mb-2">{booking.gymClass?.description}</p>
-                <p className="text-sm text-gray-400">Instructor: {booking.gymClass?.instructor}</p>
-                <p className="text-sm text-gray-400">Date: {new Date(booking.gymClass?.date).toLocaleDateString()}</p>
-                <p className="text-sm text-gray-400 mb-4">Time: {booking.gymClass?.time}</p>
+                <h3 className="text-xl font-bold mb-2">{booking.name}</h3>
+                <p className="text-gray-400 mb-2">{booking.description}</p>
+                <p className="text-sm text-gray-400">Instructor: {booking.instructor}</p>
+                <p className="text-sm text-gray-400">Date: {new Date(booking.date).toLocaleDateString()}</p>
+                <p className="text-sm text-gray-400 mb-4">Time: {booking.time}</p>
                 <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm mb-4 inline-block">Confirmed</span>
                 <button
                   onClick={() => handleCancel(booking._id)}

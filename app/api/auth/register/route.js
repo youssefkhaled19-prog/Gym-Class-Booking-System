@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import connectDB from '@/lib/db';
-import User from '@/models/User';
+import sql, { initDB } from '@/lib/db';
 
 export async function POST(request) {
   try {
@@ -11,23 +10,23 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    await connectDB();
+    await initDB();
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const existingUser = await sql`SELECT * FROM users WHERE email = ${email}`;
+    if (existingUser.length > 0) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
+    const result = await sql`
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${hashedPassword})
+      RETURNING id, name, email, role
+    `;
 
-    return NextResponse.json({ message: 'User created successfully', userId: user._id }, { status: 201 });
+    return NextResponse.json({ message: 'User created successfully', userId: result[0].id }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
-import Class from '@/models/Class';
+import sql, { initDB } from '@/lib/db';
 
 export async function GET() {
   try {
-    await connectDB();
-    const classes = await Class.find({}).sort({ date: 1 });
+    await initDB();
+    const classes = await sql`SELECT * FROM classes ORDER BY date ASC`;
     return NextResponse.json(classes);
   } catch (error) {
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -20,19 +19,16 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    await connectDB();
+    await initDB();
 
-    const gymClass = await Class.create({
-      name,
-      description,
-      instructor,
-      date,
-      time,
-      capacity,
-    });
+    const result = await sql`
+      INSERT INTO classes (name, description, instructor, date, time, capacity)
+      VALUES (${name}, ${description}, ${instructor}, ${date}, ${time}, ${capacity})
+      RETURNING *
+    `;
 
-    return NextResponse.json(gymClass, { status: 201 });
+    return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

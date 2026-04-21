@@ -1,22 +1,31 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
-import Booking from '@/models/Booking';
-import Class from '@/models/Class';
+import sql, { initDB } from '@/lib/db';
 
 export async function GET(request) {
   try {
-    await connectDB();
+    await initDB();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
-    const query = userId ? { user: userId } : {};
-    const bookings = await Booking.find(query)
-      .populate('user', 'name email')
-      .populate('gymClass');
+    let bookings;
+    if (userId) {
+      bookings = await sql`
+        SELECT bookings.*, classes.name, classes.description, classes.instructor, classes.date, classes.time
+        FROM bookings
+        JOIN classes ON bookings.class_id = classes.id
+        WHERE bookings.user_id = ${userId}
+      `;
+    } else {
+      bookings = await sql`
+        SELECT bookings.*, classes.name, classes.description, classes.instructor, classes.date, classes.time
+        FROM bookings
+        JOIN classes ON bookings.class_id = classes.id
+      `;
+    }
 
     return NextResponse.json(bookings);
   } catch (error) {
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -28,27 +37,35 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    await connectDB();
+    await initDB();
 
-    const gymClass = await Class.findById(classId);
-    if (!gymClass) {
+    const classResult = await sql`SELECT * FROM classes WHERE id = ${classId}`;
+    if (classResult.length === 0) {
       return NextResponse.json({ error: 'Class not found' }, { status: 404 });
     }
 
+    const gymClass = classResult[0];
     if (gymClass.enrolled >= gymClass.capacity) {
       return NextResponse.json({ error: 'Class is full' }, { status: 400 });
     }
 
-    const existingBooking = await Booking.findOne({ user: userId, gymClass: classId });
-    if (existingBooking) {
+    const existingBooking = await sql`
+      SELECT * FROM bookings WHERE user_id = ${userId} AND class_id = ${classId}
+    `;
+    if (existingBooking.length > 0) {
       return NextResponse.json({ error: 'Already booked this class' }, { status: 400 });
     }
 
-    const booking = await Booking.create({ user: userId, gymClass: classId });
-    await Class.findByIdAndUpdate(classId, { $inc: { enrolled: 1 } });
+    const booking = await sql`
+      INSERT INTO bookings (user_id, class_id)
+      VALUES (${userId}, ${classId})
+      RETURNING *
+    `;
 
-    return NextResponse.json(booking, { status: 201 });
+    await sql`UPDATE classes SET enrolled = enrolled + 1 WHERE id = ${classId}`;
+
+    return NextResponse.json(booking[0], { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

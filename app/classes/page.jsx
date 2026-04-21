@@ -40,7 +40,7 @@ export default function ClassesPage() {
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userData.id, classId }),
+        body: JSON.stringify({ userId: userData.id || userData._id, classId }),
       });
 
       const data = await res.json();
@@ -85,7 +85,7 @@ export default function ClassesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {classes.map((gymClass) => (
-              <div key={gymClass._id} className="bg-gray-800 p-6 rounded-xl">
+              <div key={gymClass.id} className="bg-gray-800 p-6 rounded-xl">
                 <h3 className="text-xl font-bold mb-2">{gymClass.name}</h3>
                 <p className="text-gray-400 mb-4">{gymClass.description}</p>
                 <p className="text-sm text-gray-400">Instructor: {gymClass.instructor}</p>
@@ -93,7 +93,7 @@ export default function ClassesPage() {
                 <p className="text-sm text-gray-400">Time: {gymClass.time}</p>
                 <p className="text-sm text-gray-400 mb-4">Spots: {gymClass.capacity - gymClass.enrolled} / {gymClass.capacity}</p>
                 <button
-                  onClick={() => handleBook(gymClass._id)}
+                  onClick={() => handleBook(gymClass.id)}
                   disabled={gymClass.enrolled >= gymClass.capacity}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white p-3 rounded-lg font-semibold"
                 >
