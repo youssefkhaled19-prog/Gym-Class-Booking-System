@@ -92,6 +92,7 @@ export default function ClassesPage() {
         <div className="flex gap-3 items-center">
           <span className="text-gray-400 text-sm">Hi, {user?.name}</span>
           <button onClick={() => router.push('/bookings')} className="border border-purple-600/50 hover:border-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">My Bookings</button>
+          <button onClick={() => router.push('/profile')} className="border border-purple-600/50 hover:border-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">Profile</button>
           <button onClick={handleLogout} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Logout</button>
         </div>
       </nav>
