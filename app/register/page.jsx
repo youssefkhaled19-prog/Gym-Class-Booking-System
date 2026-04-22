@@ -51,7 +51,7 @@ export default function RegisterPage() {
               <label className="text-sm text-gray-400 mb-1 block">Full Name</label>
               <input
                 type="text"
-                placeholder="Youssef Khaled"
+                placeholder=""
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition"
