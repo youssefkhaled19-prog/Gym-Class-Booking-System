@@ -10,7 +10,7 @@ export async function GET(request) {
     let bookings;
     if (userId) {
       bookings = await sql`
-        SELECT bookings.*, classes.name, classes.description, classes.instructor, classes.date, classes.time
+        SELECT bookings.id as id, bookings.status, bookings.created_at, classes.name, classes.description, classes.instructor, classes.date, classes.time
         FROM bookings
         JOIN classes ON bookings.class_id = classes.id
         WHERE bookings.user_id = ${userId}
