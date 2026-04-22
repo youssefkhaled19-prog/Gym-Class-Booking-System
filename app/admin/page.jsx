@@ -7,9 +7,10 @@ export default function AdminPage() {
   const router = useRouter();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [stats, setStats] = useState(null);
+  const [editingClass, setEditingClass] = useState(null);
   const [formData, setFormData] = useState({
     name: '', description: '', instructor: '', date: '', time: '', capacity: '',
   });
@@ -40,15 +41,16 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
   const fetchStats = async () => {
-  try {
-    const res = await fetch('/api/stats');
-    const data = await res.json();
-    setStats(data);
-  } catch (err) {
-    console.error(err);
-  }
-};
+    try {
+      const res = await fetch('/api/stats');
+      const data = await res.json();
+      setStats(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,6 +71,37 @@ export default function AdminPage() {
         setMessageType('success');
         setFormData({ name: '', description: '', instructor: '', date: '', time: '', capacity: '' });
         fetchClasses();
+        fetchStats();
+      }
+
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('Something went wrong');
+      setMessageType('error');
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/classes/${editingClass.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, capacity: Number(formData.capacity) }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.error);
+        setMessageType('error');
+      } else {
+        setMessage('Class updated successfully!');
+        setMessageType('success');
+        setEditingClass(null);
+        setFormData({ name: '', description: '', instructor: '', date: '', time: '', capacity: '' });
+        fetchClasses();
+        fetchStats();
       }
 
       setTimeout(() => setMessage(''), 3000);
@@ -85,12 +118,26 @@ export default function AdminPage() {
         setMessage('Class deleted successfully');
         setMessageType('success');
         fetchClasses();
+        fetchStats();
       }
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('Something went wrong');
       setMessageType('error');
     }
+  };
+
+  const handleEdit = (gymClass) => {
+    setEditingClass(gymClass);
+    setFormData({
+      name: gymClass.name,
+      description: gymClass.description,
+      instructor: gymClass.instructor,
+      date: gymClass.date.split('T')[0],
+      time: gymClass.time,
+      capacity: gymClass.capacity,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) return (
@@ -110,26 +157,28 @@ export default function AdminPage() {
       </nav>
 
       <div className="container mx-auto px-4 py-10">
+
         {stats && (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
-      <p className="text-3xl font-bold text-purple-400">{stats.totalUsers}</p>
-      <p className="text-gray-400 text-sm mt-1">Total Users</p>
-    </div>
-    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
-      <p className="text-3xl font-bold text-purple-400">{stats.totalClasses}</p>
-      <p className="text-gray-400 text-sm mt-1">Total Classes</p>
-    </div>
-    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
-      <p className="text-3xl font-bold text-purple-400">{stats.totalBookings}</p>
-      <p className="text-gray-400 text-sm mt-1">Total Bookings</p>
-    </div>
-    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
-      <p className="text-lg font-bold text-purple-400">{stats.popularClass?.name || 'N/A'}</p>
-      <p className="text-gray-400 text-sm mt-1">Most Popular Class</p>
-    </div>
-  </div>
-)}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+              <p className="text-3xl font-bold text-purple-400">{stats.totalUsers}</p>
+              <p className="text-gray-400 text-sm mt-1">Total Users</p>
+            </div>
+            <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+              <p className="text-3xl font-bold text-purple-400">{stats.totalClasses}</p>
+              <p className="text-gray-400 text-sm mt-1">Total Classes</p>
+            </div>
+            <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+              <p className="text-3xl font-bold text-purple-400">{stats.totalBookings}</p>
+              <p className="text-gray-400 text-sm mt-1">Total Bookings</p>
+            </div>
+            <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+              <p className="text-lg font-bold text-purple-400">{stats.popularClass?.name || 'N/A'}</p>
+              <p className="text-gray-400 text-sm mt-1">Most Popular Class</p>
+            </div>
+          </div>
+        )}
+
         {message && (
           <div className={`p-4 rounded-lg mb-6 border ${messageType === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400'}`}>
             {message}
@@ -138,8 +187,8 @@ export default function AdminPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div>
-            <h2 className="text-2xl font-bold mb-6">Add New Class</h2>
-            <form onSubmit={handleSubmit} className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl flex flex-col gap-4">
+            <h2 className="text-2xl font-bold mb-6">{editingClass ? 'Edit Class' : 'Add New Class'}</h2>
+            <form onSubmit={editingClass ? handleUpdate : handleSubmit} className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl flex flex-col gap-4">
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Class Name</label>
                 <input type="text" placeholder="e.g. Morning Yoga" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
@@ -166,7 +215,16 @@ export default function AdminPage() {
                 <label className="text-sm text-gray-400 mb-1 block">Capacity</label>
                 <input type="number" placeholder="Max number of students" value={formData.capacity} onChange={(e) => setFormData({ ...formData, capacity: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
               </div>
-              <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-xl font-semibold transition mt-2">Add Class</button>
+              <div className="flex gap-3 mt-2">
+                <button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-xl font-semibold transition">
+                  {editingClass ? 'Update Class' : 'Add Class'}
+                </button>
+                {editingClass && (
+                  <button type="button" onClick={() => { setEditingClass(null); setFormData({ name: '', description: '', instructor: '', date: '', time: '', capacity: '' }); }} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-xl font-semibold transition">
+                    Cancel
+                  </button>
+                )}
+              </div>
             </form>
           </div>
 
@@ -177,19 +235,24 @@ export default function AdminPage() {
             ) : (
               <div className="flex flex-col gap-4">
                 {classes.map((gymClass) => (
-                  <div key={gymClass.id} className="bg-gray-900 border border-purple-900/30 p-5 rounded-2xl flex justify-between items-center hover:border-purple-600/50 transition">
-                    <div>
-                      <h3 className="text-lg font-bold">{gymClass.name}</h3>
-                      <p className="text-gray-400 text-sm">👤 {gymClass.instructor}</p>
-                      <p className="text-gray-400 text-sm">📅 {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="w-24 bg-gray-800 rounded-full h-1.5">
-                          <div className="bg-purple-600 h-1.5 rounded-full" style={{width: `${(gymClass.enrolled / gymClass.capacity) * 100}%`}}></div>
+                  <div key={gymClass.id} className="bg-gray-900 border border-purple-900/30 p-5 rounded-2xl hover:border-purple-600/50 transition">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-lg font-bold">{gymClass.name}</h3>
+                        <p className="text-gray-400 text-sm">👤 {gymClass.instructor}</p>
+                        <p className="text-gray-400 text-sm">📅 {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <div className="w-24 bg-gray-800 rounded-full h-1.5">
+                            <div className="bg-purple-600 h-1.5 rounded-full" style={{width: `${(gymClass.enrolled / gymClass.capacity) * 100}%`}}></div>
+                          </div>
+                          <span className="text-xs text-gray-400">{gymClass.enrolled}/{gymClass.capacity}</span>
                         </div>
-                        <span className="text-xs text-gray-400">{gymClass.enrolled}/{gymClass.capacity}</span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button onClick={() => handleEdit(gymClass)} className="bg-purple-600/20 hover:bg-purple-600/30 border border-purple-600/50 text-purple-400 px-4 py-2 rounded-lg text-sm transition">Edit</button>
+                        <button onClick={() => handleDelete(gymClass.id)} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Delete</button>
                       </div>
                     </div>
-                    <button onClick={() => handleDelete(gymClass.id)} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Delete</button>
                   </div>
                 ))}
               </div>
