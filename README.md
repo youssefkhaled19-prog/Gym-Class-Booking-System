@@ -1,40 +1,87 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏋️ Gym Class Booking System
 
-## Getting Started
+A full-stack web application where users can browse and book gym classes, and admins can manage the schedule.
 
-First, run the development server:
+## 🔗 Links
+- **Live App:** https://gym-class-booking-system.vercel.app
+- **GitHub:** https://github.com/youssefkhaled19-prog/Gym-Class-Booking-System
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 👥 Team
+| Name | Role |
+|------|------|
+| Youssef Khaled | Full-Stack Development |
+| Abdelrahman Galal | Full-Stack Development |
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
+| Layer | Technology |
+|-------|------------|
+| Frontend | React.js via Next.js |
+| Backend | Next.js API Routes |
+| Database | PostgreSQL (Neon) |
+| Auth | JWT + bcrypt |
+| Deployment | Vercel |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
+### User
+- Register and login securely
+- Browse all available gym classes
+- Book a class (capacity enforced)
+- View and cancel bookings
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin
+- Add new gym classes
+- Delete existing classes
+- View enrollment per class
 
-## Learn More
+## 🗄️ Database Schema
+### users
+| Field | Type |
+|-------|------|
+| id | SERIAL PRIMARY KEY |
+| name | VARCHAR |
+| email | VARCHAR (unique) |
+| password | VARCHAR (hashed) |
+| role | VARCHAR (user/admin) |
+| created_at | TIMESTAMP |
 
-To learn more about Next.js, take a look at the following resources:
+### classes
+| Field | Type |
+|-------|------|
+| id | SERIAL PRIMARY KEY |
+| name | VARCHAR |
+| description | TEXT |
+| instructor | VARCHAR |
+| date | DATE |
+| time | VARCHAR |
+| capacity | INTEGER |
+| enrolled | INTEGER |
+| created_at | TIMESTAMP |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### bookings
+| Field | Type |
+|-------|------|
+| id | SERIAL PRIMARY KEY |
+| user_id | INTEGER (FK → users) |
+| class_id | INTEGER (FK → classes) |
+| status | VARCHAR |
+| created_at | TIMESTAMP |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📡 API Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/auth/register | Register new user |
+| POST | /api/auth/login | Login and receive JWT |
+| GET | /api/classes | Get all classes |
+| POST | /api/classes | Add a class (admin) |
+| PUT | /api/classes/:id | Update a class (admin) |
+| DELETE | /api/classes/:id | Delete a class (admin) |
+| GET | /api/bookings | Get bookings |
+| POST | /api/bookings | Book a class |
+| DELETE | /api/bookings/:id | Cancel a booking |
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# Gym-Class-Booking-System
->>>>>>> c8bcb4b0e8159bead785b5cb66a4714c8678e24b
+## ⚙️ Local Setup
+1. Clone the repo
+2. Run `npm install`
+3. Create `.env.local` and add your `DATABASE_URL` and `JWT_SECRET`
+4. Run `npm run dev`
+5. Open `http://localhost:3000`
