@@ -7,6 +7,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [formData, setFormData] = useState({
@@ -25,6 +26,7 @@ export default function AdminPage() {
       return;
     }
     fetchClasses();
+    fetchStats();
   }, []);
 
   const fetchClasses = async () => {
@@ -38,6 +40,15 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+  const fetchStats = async () => {
+  try {
+    const res = await fetch('/api/stats');
+    const data = await res.json();
+    setStats(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,6 +110,26 @@ export default function AdminPage() {
       </nav>
 
       <div className="container mx-auto px-4 py-10">
+        {stats && (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+      <p className="text-3xl font-bold text-purple-400">{stats.totalUsers}</p>
+      <p className="text-gray-400 text-sm mt-1">Total Users</p>
+    </div>
+    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+      <p className="text-3xl font-bold text-purple-400">{stats.totalClasses}</p>
+      <p className="text-gray-400 text-sm mt-1">Total Classes</p>
+    </div>
+    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+      <p className="text-3xl font-bold text-purple-400">{stats.totalBookings}</p>
+      <p className="text-gray-400 text-sm mt-1">Total Bookings</p>
+    </div>
+    <div className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl text-center">
+      <p className="text-lg font-bold text-purple-400">{stats.popularClass?.name || 'N/A'}</p>
+      <p className="text-gray-400 text-sm mt-1">Most Popular Class</p>
+    </div>
+  </div>
+)}
         {message && (
           <div className={`p-4 rounded-lg mb-6 border ${messageType === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400'}`}>
             {message}
