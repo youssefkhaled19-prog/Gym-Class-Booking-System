@@ -10,6 +10,8 @@ export default function ClassesPage() {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const userCookie = Cookies.get('user');
@@ -68,6 +70,15 @@ export default function ClassesPage() {
     router.push('/');
   };
 
+  const filteredClasses = classes.filter((gymClass) => {
+    const matchesSearch = gymClass.name.toLowerCase().includes(search.toLowerCase()) ||
+      gymClass.instructor.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' ||
+      (filter === 'available' && gymClass.enrolled < gymClass.capacity) ||
+      (filter === 'full' && gymClass.enrolled >= gymClass.capacity);
+    return matchesSearch && matchesFilter;
+  });
+
   if (loading) return (
     <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
       <div className="text-purple-400 text-xl">Loading...</div>
@@ -95,11 +106,30 @@ export default function ClassesPage() {
           </div>
         )}
 
-        {classes.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">No classes available yet.</div>
+        <div className="flex gap-4 mb-8">
+          <input
+            type="text"
+            placeholder="Search by class name or instructor..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-gray-900 border border-purple-900/30 focus:border-purple-500 text-white p-3 rounded-xl outline-none transition flex-1"
+          />
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="bg-gray-900 border border-purple-900/30 focus:border-purple-500 text-white p-3 rounded-xl outline-none transition"
+          >
+            <option value="all">All Classes</option>
+            <option value="available">Available Only</option>
+            <option value="full">Full Classes</option>
+          </select>
+        </div>
+
+        {filteredClasses.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">No classes found.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {classes.map((gymClass) => (
+            {filteredClasses.map((gymClass) => (
               <div key={gymClass.id} className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl hover:border-purple-600/50 transition">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold">{gymClass.name}</h3>
