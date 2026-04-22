@@ -8,6 +8,7 @@ export default function AdminPage() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
   const [formData, setFormData] = useState({
     name: '', description: '', instructor: '', date: '', time: '', capacity: '',
   });
@@ -51,8 +52,10 @@ export default function AdminPage() {
 
       if (!res.ok) {
         setMessage(data.error);
+        setMessageType('error');
       } else {
         setMessage('Class created successfully!');
+        setMessageType('success');
         setFormData({ name: '', description: '', instructor: '', date: '', time: '', capacity: '' });
         fetchClasses();
       }
@@ -60,6 +63,7 @@ export default function AdminPage() {
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('Something went wrong');
+      setMessageType('error');
     }
   };
 
@@ -68,53 +72,93 @@ export default function AdminPage() {
       const res = await fetch(`/api/classes/${classId}`, { method: 'DELETE' });
       if (res.ok) {
         setMessage('Class deleted successfully');
+        setMessageType('success');
         fetchClasses();
       }
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('Something went wrong');
+      setMessageType('error');
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">Loading...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+      <div className="text-purple-400 text-xl">Loading...</div>
+    </div>
+  );
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white">
-      <nav className="bg-gray-800 p-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">GymBook Admin</h1>
-        <button onClick={() => { Cookies.remove('token'); Cookies.remove('user'); router.push('/'); }} className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Logout</button>
+    <main className="min-h-screen bg-gray-950 text-white">
+      <nav className="border-b border-purple-900/30 px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GymBook</h1>
+          <p className="text-xs text-purple-400">Admin Dashboard</p>
+        </div>
+        <button onClick={() => { Cookies.remove('token'); Cookies.remove('user'); router.push('/'); }} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Logout</button>
       </nav>
 
       <div className="container mx-auto px-4 py-10">
+        {message && (
+          <div className={`p-4 rounded-lg mb-6 border ${messageType === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400'}`}>
+            {message}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div>
             <h2 className="text-2xl font-bold mb-6">Add New Class</h2>
-            {message && <p className="bg-blue-600 text-white p-3 rounded-lg mb-4">{message}</p>}
-            <form onSubmit={handleSubmit} className="bg-gray-800 p-6 rounded-xl flex flex-col gap-4">
-              <input type="text" placeholder="Class Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <textarea placeholder="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <input type="text" placeholder="Instructor" value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <input type="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <input type="number" placeholder="Capacity" value={formData.capacity} onChange={(e) => setFormData({ ...formData, capacity: e.target.value })} className="bg-gray-700 text-white p-3 rounded-lg" required />
-              <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold">Add Class</button>
+            <form onSubmit={handleSubmit} className="bg-gray-900 border border-purple-900/30 p-6 rounded-2xl flex flex-col gap-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Class Name</label>
+                <input type="text" placeholder="e.g. Morning Yoga" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Description</label>
+                <textarea placeholder="Describe the class..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Instructor</label>
+                <input type="text" placeholder="Instructor name" value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Date</label>
+                  <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Time</label>
+                  <input type="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Capacity</label>
+                <input type="number" placeholder="Max number of students" value={formData.capacity} onChange={(e) => setFormData({ ...formData, capacity: e.target.value })} className="w-full bg-gray-800 border border-gray-700 focus:border-purple-500 text-white p-3 rounded-lg outline-none transition" required />
+              </div>
+              <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-xl font-semibold transition mt-2">Add Class</button>
             </form>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold mb-6">Manage Classes</h2>
+            <h2 className="text-2xl font-bold mb-6">Manage Classes ({classes.length})</h2>
             {classes.length === 0 ? (
-              <p className="text-gray-400">No classes yet.</p>
+              <div className="text-center py-20 text-gray-500">No classes yet.</div>
             ) : (
               <div className="flex flex-col gap-4">
                 {classes.map((gymClass) => (
-                  <div key={gymClass._id} className="bg-gray-800 p-6 rounded-xl flex justify-between items-center">
+                  <div key={gymClass.id} className="bg-gray-900 border border-purple-900/30 p-5 rounded-2xl flex justify-between items-center hover:border-purple-600/50 transition">
                     <div>
                       <h3 className="text-lg font-bold">{gymClass.name}</h3>
-                      <p className="text-gray-400 text-sm">{gymClass.instructor} — {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
-                      <p className="text-gray-400 text-sm">Enrolled: {gymClass.enrolled} / {gymClass.capacity}</p>
+                      <p className="text-gray-400 text-sm">👤 {gymClass.instructor}</p>
+                      <p className="text-gray-400 text-sm">📅 {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-24 bg-gray-800 rounded-full h-1.5">
+                          <div className="bg-purple-600 h-1.5 rounded-full" style={{width: `${(gymClass.enrolled / gymClass.capacity) * 100}%`}}></div>
+                        </div>
+                        <span className="text-xs text-gray-400">{gymClass.enrolled}/{gymClass.capacity}</span>
+                      </div>
                     </div>
-                    <button onClick={() => handleDelete(gymClass._id)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">Delete</button>
+                    <button onClick={() => handleDelete(gymClass.id)} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Delete</button>
                   </div>
                 ))}
               </div>
