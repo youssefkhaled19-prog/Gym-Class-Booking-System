@@ -19,19 +19,23 @@ A full-stack web application where users can browse and book gym classes, and ad
 | Backend | Next.js API Routes |
 | Database | PostgreSQL (Neon) |
 | Auth | JWT + bcrypt |
+| Email | Resend |
 | Deployment | Vercel |
 
 ## ✨ Features
 ### User
 - Register and login securely
-- Browse all available gym classes
+- Browse and search gym classes
+- Filter classes by availability
 - Book a class (capacity enforced)
+- Receive email confirmation on booking
 - View and cancel bookings
+- Edit profile and change password
 
 ### Admin
-- Add new gym classes
-- Delete existing classes
-- View enrollment per class
+- Add, edit, and delete gym classes
+- View dashboard stats (total users, classes, bookings, most popular class)
+- Monitor enrollment per class
 
 ## 🗄️ Database Schema
 ### users
@@ -76,12 +80,14 @@ A full-stack web application where users can browse and book gym classes, and ad
 | PUT | /api/classes/:id | Update a class (admin) |
 | DELETE | /api/classes/:id | Delete a class (admin) |
 | GET | /api/bookings | Get bookings |
-| POST | /api/bookings | Book a class |
+| POST | /api/bookings | Book a class (sends email) |
 | DELETE | /api/bookings/:id | Cancel a booking |
+| GET | /api/stats | Get admin dashboard stats |
+| PUT | /api/profile | Update user profile |
 
 ## ⚙️ Local Setup
 1. Clone the repo
 2. Run `npm install`
-3. Create `.env.local` and add your `DATABASE_URL` and `JWT_SECRET`
+3. Create `.env.local` and add your `DATABASE_URL`, `JWT_SECRET`, and `RESEND_API_KEY`
 4. Run `npm run dev`
 5. Open `http://localhost:3000`
