@@ -38,7 +38,13 @@ export async function DELETE(request, { params }) {
   try {
     await initDB();
     const { id } = await params;
-    const result = await sql`DELETE FROM classes WHERE id = ${parseInt(id)} RETURNING *`;
+    const classId = parseInt(id);
+    
+    // Delete bookings for this class first
+    await sql`DELETE FROM bookings WHERE class_id = ${classId}`;
+    
+    // Then delete the class
+    const result = await sql`DELETE FROM classes WHERE id = ${classId} RETURNING *`;
     if (result.length === 0) {
       return NextResponse.json({ error: 'Class not found' }, { status: 404 });
     }
