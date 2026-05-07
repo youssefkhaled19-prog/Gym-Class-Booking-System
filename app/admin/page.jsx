@@ -250,7 +250,7 @@ export default function AdminPage() {
                       </div>
                       <div className="flex flex-col gap-2">
                         <button onClick={() => handleEdit(gymClass)} className="bg-purple-600/20 hover:bg-purple-600/30 border border-purple-600/50 text-purple-400 px-4 py-2 rounded-lg text-sm transition">Edit</button>
-                        <button onClick={() => handleDelete(gymClass.id)} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Delete</button>
+                        <button onClick={() => handleDelete(parseInt(gymClass.id))} className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 px-4 py-2 rounded-lg text-sm transition">Delete</button>
                       </div>
                     </div>
                   </div>
