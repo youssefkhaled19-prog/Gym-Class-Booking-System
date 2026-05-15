@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { User, Calendar, Clock, Users } from 'lucide-react';
 
 export default function ClassesPage() {
   const router = useRouter();
@@ -140,10 +141,10 @@ export default function ClassesPage() {
                 </div>
                 <p className="text-gray-400 text-sm mb-4">{gymClass.description}</p>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm text-gray-400">👤 {gymClass.instructor}</p>
-                  <p className="text-sm text-gray-400">📅 {new Date(gymClass.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-400">🕐 {gymClass.time}</p>
-                  <p className="text-sm text-gray-400">🪑 {gymClass.capacity - gymClass.enrolled} spots left</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><User size={14} /> {gymClass.instructor}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Calendar size={14} /> {new Date(gymClass.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Clock size={14} /> {gymClass.time}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Users size={14} /> {gymClass.capacity - gymClass.enrolled} spots left</p>
                 </div>
                 <div className="w-full bg-gray-800 rounded-full h-1.5 mb-4">
                   <div className="bg-purple-600 h-1.5 rounded-full" style={{width: `${(gymClass.enrolled / gymClass.capacity) * 100}%`}}></div>

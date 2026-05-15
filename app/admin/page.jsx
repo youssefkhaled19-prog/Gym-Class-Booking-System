@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { User, Calendar } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -239,8 +240,8 @@ export default function AdminPage() {
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="text-lg font-bold">{gymClass.name}</h3>
-                        <p className="text-gray-400 text-sm">👤 {gymClass.instructor}</p>
-                        <p className="text-gray-400 text-sm">📅 {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
+                        <p className="text-gray-400 text-sm flex items-center gap-2"><User size={14} /> {gymClass.instructor}</p>
+                        <p className="text-gray-400 text-sm flex items-center gap-2"><Calendar size={14} /> {new Date(gymClass.date).toLocaleDateString()} at {gymClass.time}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <div className="w-24 bg-gray-800 rounded-full h-1.5">
                             <div className="bg-purple-600 h-1.5 rounded-full" style={{width: `${(gymClass.enrolled / gymClass.capacity) * 100}%`}}></div>

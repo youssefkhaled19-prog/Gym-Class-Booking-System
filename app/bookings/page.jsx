@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { User, Calendar, Clock } from 'lucide-react';
 
 export default function BookingsPage() {
   const router = useRouter();
@@ -83,9 +84,9 @@ export default function BookingsPage() {
                 </div>
                 <p className="text-gray-400 text-sm mb-4">{booking.description}</p>
                 <div className="space-y-1 mb-6">
-                  <p className="text-sm text-gray-400">👤 {booking.instructor}</p>
-                  <p className="text-sm text-gray-400">📅 {new Date(booking.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-400">🕐 {booking.time}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><User size={14} /> {booking.instructor}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Calendar size={14} /> {new Date(booking.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2 mb-4"><Clock size={14} /> {booking.time}</p>
                 </div>
                 <button
                   onClick={() => handleCancel(booking.id)}
