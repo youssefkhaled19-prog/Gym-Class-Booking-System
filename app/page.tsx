@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Dumbbell, Zap, Trophy } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -13,7 +14,7 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-32 text-center">
         <div className="inline-block bg-purple-600/20 text-purple-400 text-sm px-4 py-2 rounded-full mb-6 border border-purple-600/30">
-           Your Premium Gym Experience
+          Your Premium Gym Experience
         </div>
         <h1 className="text-6xl font-bold mb-6 leading-tight">
           Book Your Classes
@@ -34,17 +35,17 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-20 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-gray-900 border border-purple-900/30 p-8 rounded-2xl">
-          <div className="text-4xl mb-4"></div>
+          <Dumbbell size={40} className="text-purple-400 mb-4" />
           <h3 className="text-xl font-bold mb-2">Diverse Classes</h3>
           <p className="text-gray-400">From yoga to HIIT, find the perfect class for your fitness goals.</p>
         </div>
         <div className="bg-gray-900 border border-purple-900/30 p-8 rounded-2xl">
-          <div className="text-4xl mb-4"></div>
+          <Zap size={40} className="text-purple-400 mb-4" />
           <h3 className="text-xl font-bold mb-2">Easy Booking</h3>
           <p className="text-gray-400">Book your spot in seconds and manage your schedule with ease.</p>
         </div>
         <div className="bg-gray-900 border border-purple-900/30 p-8 rounded-2xl">
-          <div className="text-4xl mb-4"></div>
+          <Trophy size={40} className="text-purple-400 mb-4" />
           <h3 className="text-xl font-bold mb-2">Expert Instructors</h3>
           <p className="text-gray-400">Train with certified professionals who are passionate about fitness.</p>
         </div>
